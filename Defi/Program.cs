@@ -129,7 +129,7 @@ namespace Defi
 			}
 
 			IEnumerable <ConsoleKey> keysHandler
-				= Keys.Handle(Keys.HorizontalSelectorKeys.Concat(new[] { ConsoleKey.F6 }).ToArray());
+				= Keys.Handle(Keys.HorizontalSelectorKeys.Concat(new[] { ConsoleKey.F6 }).ToArray(), true);
 			
 			foreach (ConsoleKey key in keysHandler)
 			{
@@ -264,7 +264,7 @@ namespace Defi
 			}
 			
 			IEnumerable <ConsoleKey> keysHandler
-				= Keys.Handle(Keys.HorizontalSelectorKeys.Concat(new[] { ConsoleKey.F6 }).ToArray());
+				= Keys.Handle(Keys.HorizontalSelectorKeys.Concat(new[] { ConsoleKey.F6 }).ToArray(), true);
 			
 			foreach (ConsoleKey key in keysHandler)
 			{
