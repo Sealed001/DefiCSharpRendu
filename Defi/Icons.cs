@@ -1,6 +1,5 @@
 ﻿namespace Defi
 {
-	//Stocks characters icons
 	public class Icons
 	{
 		public const string Shrek = "O     O\n \\___/\n |___\n  ___|";

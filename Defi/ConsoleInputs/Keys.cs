@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ConsoleInputs
 {
-	//Handles the character and action selector with the arrow keys
+	// Implementations of key handlers as enumerable
 	public class Keys
 	{
 		public static readonly ConsoleKey[] HorizontalSelectorKeys = {

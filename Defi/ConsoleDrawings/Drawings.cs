@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ConsoleDrawings
 {
@@ -32,8 +31,9 @@ namespace ConsoleDrawings
 			}
 		}
 
-		private int _x; 
-		private int _y;
+		private readonly int _x;
+		private readonly int _y;
+		
 		public ConsoleWindow ConsoleWindow;
 
 		public ConsoleWindowCharacter(int x, int y, char character, ConsoleColor color = ConsoleColor.White)
@@ -68,19 +68,20 @@ namespace ConsoleDrawings
 	{
 		public readonly ConsoleWindowCharacter[,] ConsoleWindowCharacters;
 
-		public readonly int Width;
-		public readonly int Height;
-
+		// Store last coordinates to draw faster
+		// ( Prevent pointless SetCursorPosition execution )
 		public int[] LastCoordinates = { 0, 0 };
-
-		private KeyValuePair<char, ConsoleColor>[,] _scheme;
+		
+		private readonly int _width;
+		private readonly int _height;
+		private readonly KeyValuePair<char, ConsoleColor>[,] _scheme;
 
 		public ConsoleWindow(int width, int height, KeyValuePair<char, ConsoleColor>[,] scheme)
 		{
+			_width = width;
+			_height = height;
 			_scheme = scheme;
-			Width = width;
-			Height = height;
-			
+
 			Console.Clear();
 			Console.ResetColor();
 
@@ -103,7 +104,7 @@ namespace ConsoleDrawings
 			{
 				for (int x = 0; x < _scheme.GetLength(0); x++)
 				{
-					if (x >= Width || y >= Height) continue;
+					if (x >= _width || y >= _height) continue;
 
 					ConsoleWindowCharacters[x, y].Character = _scheme[x, y].Key;
 					ConsoleWindowCharacters[x, y].Color = _scheme[x, y].Value;
@@ -114,9 +115,9 @@ namespace ConsoleDrawings
 
 		public void SetCharactersWindowAccessor()
 		{
-			for (int x = 0; x < Width; x++)
+			for (int x = 0; x < _width; x++)
 			{
-				for (int y = 0; y < Height; y++)
+				for (int y = 0; y < _height; y++)
 				{
 					ConsoleWindowCharacters[x, y].ConsoleWindow = this;
 				}
@@ -126,26 +127,19 @@ namespace ConsoleDrawings
 
 	public abstract class DrawZone
 	{
-		public abstract int X { get; }
-		public abstract int Y { get; }
-		public abstract int Width { get; }
-		public abstract int Height { get; }
-
-
-		public DrawZone(ConsoleWindow consoleWindow)
+		protected readonly ConsoleWindow ConsoleWindow;
+		
+		protected DrawZone(ConsoleWindow consoleWindow)
 		{
 			ConsoleWindow = consoleWindow;
 		}
-
-
-		public ConsoleWindow ConsoleWindow;
-
-
+		
 		public abstract void ReRender();
 	}
 	
 	public class ConsoleDrawZone : DrawZone
 	{
+		// Square emojis color transposition table
 		private static readonly Dictionary<string, ConsoleColor> Colors = new()
 		{
 			{"🟥", ConsoleColor.Red},
@@ -155,21 +149,21 @@ namespace ConsoleDrawings
 			{"🟪", ConsoleColor.Magenta}
 		};
 		
+		// First character of square emojis
 		private const char StartColor = (char)55357;
+		
+		// Character used to reset the color
 		private const char ResetColor = '⬜';
+		
+		// Character used to disable colors
 		private const char IgnoreColor = '❌';
+		
+		// Character used to enable the color
 		private const char AcknowledgeColor = '⭕';
 		
 		private ConsoleColor _lastColor;
 		private ConsoleColor _currentColor = ConsoleColor.White;
 		private bool _ignoreColors;
-		
-
-		public override int X => _x;
-		public override int Y => _y;
-		public override int Width => _width;
-		public override int Height => _height;
-
 
 		private readonly int _x;
 		private readonly int _y;
@@ -178,7 +172,7 @@ namespace ConsoleDrawings
 		private readonly int _bottomOffset;
 		
 		private int _cursorX;
-		private KeyValuePair<char, ConsoleColor>[,] _characters;
+		private readonly KeyValuePair<char, ConsoleColor>[,] _characters;
 		
 		public ConsoleDrawZone(ConsoleWindow consoleWindow, int x, int y, int width, int height, int bottomOffset = 0) : base(consoleWindow)
 		{
@@ -265,7 +259,7 @@ namespace ConsoleDrawings
 		{
 			Write($"\n{text.ToString()}");
 		}
-
+		
 		private void NextLine()
 		{
 			_cursorX = 0;
@@ -368,18 +362,10 @@ namespace ConsoleDrawings
 			}
 		}
 	}
-	
-	public class Choices
-	{
-		public static string[] EnumChoices<TChoices>()
-		{
-			return Enum.GetNames(typeof(TChoices)).ToArray();
-		}
-	}
 
 	public class Scheme
 	{
-		private KeyValuePair<char, ConsoleColor>[,] _scheme;
+		private readonly KeyValuePair<char, ConsoleColor>[,] _scheme;
 
 		public Scheme(int width, int height, char defaultCharacter = ' ', ConsoleColor defaultColor = ConsoleColor.White)
 		{

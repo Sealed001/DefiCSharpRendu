@@ -42,7 +42,7 @@ namespace Defi.Characters
 		}
 		public override string ToString()
 		{
-			return $"{(Robot ? "🟥" : "🟦")}{Name}⬜ [ 🟥{new string('♥', Life)}{new string('_', InitialLife - Life)}⬜ ]";
+			return $"{(Robot ? "🟥" : "🟦")}{Name}⬜ [ 🟥{new string('♥', Math.Max(Life, 0))}{new string('_', Math.Max(InitialLife - Life, 0))}⬜ ]";
 		}
 		public void Do(CharacterActions characterAction, Character enemy)
 		{
